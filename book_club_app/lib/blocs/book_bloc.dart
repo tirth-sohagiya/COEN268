@@ -1,114 +1,79 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:equatable/equatable.dart';
 import '../models/book.dart';
 
-/// Enum representing the current sort mode.
+/// Defines how the books can be sorted.
 enum SortType { author, title }
 
-/// ---------------------------------------------------------------------------
-/// EVENTS
-/// ---------------------------------------------------------------------------
+/// Book-related events.
+abstract class BookEvent {}
 
-/// Base class for all book-related events.
-abstract class BookEvent extends Equatable {
-  const BookEvent();
+class LoadBooks extends BookEvent {}
 
-  @override
-  List<Object?> get props => [];
-}
-
-/// Event triggered when the list should be sorted by author.
 class SortByAuthor extends BookEvent {}
 
-/// Event triggered when the list should be sorted by title.
 class SortByTitle extends BookEvent {}
 
-/// Event triggered when the user navigates back to the book list view.
 class ShowBookList extends BookEvent {}
 
-/// ---------------------------------------------------------------------------
-/// STATES
-/// ---------------------------------------------------------------------------
+/// States representing different stages of book data.
+abstract class BookState {}
 
-/// Base class for all states of the BookBloc.
-abstract class BookState extends Equatable {
-  const BookState();
-
-  @override
-  List<Object?> get props => [];
-}
-
-/// State indicating that the application is loading data.
 class BookLoading extends BookState {}
 
-/// State representing a loaded list of books.
 class BookListLoaded extends BookState {
   final List<Book> books;
   final SortType sortType;
 
-  const BookListLoaded({
+  BookListLoaded({
     required this.books,
     required this.sortType,
   });
-
-  @override
-  List<Object?> get props => [books, sortType];
 }
 
-/// ---------------------------------------------------------------------------
-/// BLOC IMPLEMENTATION
-/// ---------------------------------------------------------------------------
-
-/// Bloc that manages the loading, sorting, and presentation of books.
+/// The main Bloc handling book data and sorting logic.
 class BookBloc extends Bloc<BookEvent, BookState> {
-  /// Internal list of books.
-  List<Book> _bookList = [];
-
   BookBloc() : super(BookLoading()) {
+    on<LoadBooks>(_onLoadBooks);
     on<SortByAuthor>(_onSortByAuthor);
     on<SortByTitle>(_onSortByTitle);
     on<ShowBookList>(_onShowBookList);
 
-    _initializeBooks();
+    // Load books automatically after Bloc initialization
+    Future.microtask(() => add(LoadBooks()));
   }
 
-  /// Initializes the book list asynchronously.
-  Future<void> _initializeBooks() async {
-    emit(BookLoading());
-    await Future.delayed(const Duration(milliseconds: 500));
-    _bookList = sampleBooks;
-    emit(BookListLoaded(books: _bookList, sortType: SortType.author));
-  }
-
-  /// Handles the [SortByAuthor] event.
-  Future<void> _onSortByAuthor(
-    SortByAuthor event,
-    Emitter<BookState> emit,
-  ) async {
-    emit(BookLoading());
-    await Future.delayed(const Duration(milliseconds: 300));
-    final sorted = List<Book>.from(_bookList)
+  /// Loads all books and sorts them by author by default.
+  void _onLoadBooks(LoadBooks event, Emitter<BookState> emit) {
+    final sortedBooks = List<Book>.from(sampleBooks)
       ..sort((a, b) => a.author.compareTo(b.author));
-    emit(BookListLoaded(books: sorted, sortType: SortType.author));
+
+    emit(BookListLoaded(books: sortedBooks, sortType: SortType.author));
   }
 
-  /// Handles the [SortByTitle] event.
-  Future<void> _onSortByTitle(
-    SortByTitle event,
-    Emitter<BookState> emit,
-  ) async {
-    emit(BookLoading());
-    await Future.delayed(const Duration(milliseconds: 300));
-    final sorted = List<Book>.from(_bookList)
-      ..sort((a, b) => a.title.compareTo(b.title));
-    emit(BookListLoaded(books: sorted, sortType: SortType.title));
+  /// Sorts books by author.
+  void _onSortByAuthor(SortByAuthor event, Emitter<BookState> emit) {
+    if (state is BookListLoaded) {
+      final current = (state as BookListLoaded).books;
+      final sorted = List<Book>.from(current)
+        ..sort((a, b) => a.author.compareTo(b.author));
+      emit(BookListLoaded(books: sorted, sortType: SortType.author));
+    }
   }
 
-  /// Handles the [ShowBookList] event.
-  void _onShowBookList(
-    ShowBookList event,
-    Emitter<BookState> emit,
-  ) {
-    emit(BookListLoaded(books: _bookList, sortType: SortType.author));
+  /// Sorts books by title.
+  void _onSortByTitle(SortByTitle event, Emitter<BookState> emit) {
+    if (state is BookListLoaded) {
+      final current = (state as BookListLoaded).books;
+      final sorted = List<Book>.from(current)
+        ..sort((a, b) => a.title.compareTo(b.title));
+      emit(BookListLoaded(books: sorted, sortType: SortType.title));
+    }
+  }
+
+  /// Returns to the book list view when navigating back from details.
+  void _onShowBookList(ShowBookList event, Emitter<BookState> emit) {
+    if (state is! BookListLoaded) {
+      add(LoadBooks());
+    }
   }
 }

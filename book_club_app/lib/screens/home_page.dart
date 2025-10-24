@@ -4,7 +4,7 @@ import '../blocs/book_bloc.dart';
 import '../models/book.dart';
 import 'detail_page.dart';
 
-/// The main home page for the Book Club app.
+/// The main home page of the Book Club app.
 /// Displays a list of books and allows sorting by author or title.
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -12,7 +12,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Custom header bar (pink rectangle, centered title, menu + profile icons)
+      // Custom top header with title, menu, and profile icons
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(64),
         child: SafeArea(
@@ -25,15 +25,10 @@ class HomePage extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Left: Menu icon
                 IconButton(
                   icon: const Icon(Icons.menu, color: Colors.black),
-                  onPressed: () {
-                    // Handle drawer or navigation here if needed
-                  },
+                  onPressed: () {},
                 ),
-
-                // Center: Title
                 const Text(
                   'Book Club Home',
                   style: TextStyle(
@@ -42,8 +37,6 @@ class HomePage extends StatelessWidget {
                     fontSize: 20,
                   ),
                 ),
-
-                // Right: Profile icon
                 const Icon(
                   Icons.account_circle,
                   color: Colors.black,
@@ -55,13 +48,13 @@ class HomePage extends StatelessWidget {
         ),
       ),
 
-      // Main content
+      // Main content area
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Row: "Sort by" label and filter chips in the same line
+            // Sorting section
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -78,7 +71,6 @@ class HomePage extends StatelessWidget {
             ),
             const SizedBox(height: 16),
 
-            // Section title
             const Text(
               'Books',
               style: TextStyle(
@@ -88,7 +80,7 @@ class HomePage extends StatelessWidget {
             ),
             const SizedBox(height: 8),
 
-            // Book list (handled via BLoC)
+            // Book list loaded via Bloc
             Expanded(
               child: BlocBuilder<BookBloc, BookState>(
                 builder: (context, state) {
@@ -108,7 +100,7 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  /// Builds the sorting chips for Author / Title.
+  /// Builds sorting chips for Author and Title.
   Widget _buildSortButtons(BuildContext context) {
     return BlocBuilder<BookBloc, BookState>(
       builder: (context, state) {
@@ -136,7 +128,7 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  /// Builds the horizontal list of books.
+  /// Builds a horizontally scrollable list of book covers.
   Widget _buildBookList(BuildContext context, List<Book> books) {
     return ListView.separated(
       scrollDirection: Axis.horizontal,

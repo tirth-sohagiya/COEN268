@@ -15,10 +15,10 @@ class Book {
 // mock data
 final List<Book> sampleBooks = [
   Book(
-    title: 'Charmer and Grit – Part One: Rising Through the Sparks',
+    title: 'Carmer and Grit – Part One: Rising Through the Sparks',
     author: 'Sarah Jean Horwitz',
     description:
-        'Part One of “Charmer and Grit” introduces Felix Carmer III, a young tinkerer and apprentice magician who dreams of designing inventions that will change the world. '
+        'Part One of “Carmer and Grit” introduces Felix Carmer III, a young tinkerer and apprentice magician who dreams of designing inventions that will change the world. '
         'But in the bustling steampunk city of Skemantis, innovation is a luxury few can afford, and Felix’s master expects results that dazzle the crowds, not devices that actually work. '
         'When a string of mysterious disappearances hits the city’s magical fairs, Carmer crosses paths with Grit, a sharp-tongued faerie with one broken wing and a relentless curiosity about the human world.\n\n'
         'Bound by necessity and a shared sense of rebellion, the two form an uneasy alliance to uncover the truth behind the vanishings. '
